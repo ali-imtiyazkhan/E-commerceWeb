@@ -12,17 +12,16 @@ function generateToken(userId: string, email: string, role: string): string {
   });
 }
 
-/** Set JWT in secure HTTP-only cookie */
-/** Set JWT in secure HTTP-only cookie */
+/** Set JWT token in secure, HTTP-only cookie */
 function setToken(res: Response, token: string): void {
   const isProduction = process.env.NODE_ENV === "production";
 
   res.cookie("accessToken", token, {
-    httpOnly: true, // cannot be accessed by JS
-    secure: isProduction, // HTTPS only in prod
-    sameSite: isProduction ? "none" : "lax", // 'none' for cross-site cookies
-    path: "/", // ensure cookie is sent everywhere
-    maxAge: 60 * 60 * 1000, // 1 hour
+    httpOnly: true,
+    secure: isProduction,               // true in production, false in dev
+    sameSite: isProduction ? "none" : "lax",  // cross-site in prod, lax in dev
+    path: "/",                        // cookie valid for entire site
+    maxAge: 60 * 60 * 1000,          // 1 hour
   });
 }
 
@@ -32,9 +31,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      res
-        .status(400)
-        .json({ success: false, error: "All fields are required" });
+      res.status(400).json({ success: false, error: "All fields are required" });
       return;
     }
 
@@ -70,9 +67,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res
-        .status(400)
-        .json({ success: false, error: "Email and password are required" });
+      res.status(400).json({ success: false, error: "Email and password are required" });
       return;
     }
 
@@ -89,7 +84,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     const token = generateToken(user.id, user.email, user.role);
-    setToken(res, token); // sets cookie automatically
+    setToken(res, token); // sets JWT cookie
 
     res.status(200).json({
       success: true,
@@ -100,7 +95,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         role: user.role,
       },
-      accessToken: token, // optional: still send token for frontend API use
+      accessToken: token, // optional, useful for frontend API calls
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -110,10 +105,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 /** Logout user */
 export const logout = async (req: Request, res: Response): Promise<void> => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.clearCookie("accessToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
   });
 
   res.json({
