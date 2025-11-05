@@ -13,11 +13,15 @@ function generateToken(userId: string, email: string, role: string): string {
 }
 
 /** Set JWT in secure HTTP-only cookie */
+/** Set JWT in secure HTTP-only cookie */
 function setToken(res: Response, token: string): void {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("accessToken", token, {
     httpOnly: true, // cannot be accessed by JS
-    secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-    sameSite: "strict",
+    secure: isProduction, // HTTPS only in prod
+    sameSite: isProduction ? "none" : "lax", // 'none' for cross-site cookies
+    path: "/", // ensure cookie is sent everywhere
     maxAge: 60 * 60 * 1000, // 1 hour
   });
 }
@@ -28,7 +32,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      res.status(400).json({ success: false, error: "All fields are required" });
+      res
+        .status(400)
+        .json({ success: false, error: "All fields are required" });
       return;
     }
 
@@ -64,7 +70,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res.status(400).json({ success: false, error: "Email and password are required" });
+      res
+        .status(400)
+        .json({ success: false, error: "Email and password are required" });
       return;
     }
 
