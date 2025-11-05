@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
@@ -8,7 +9,8 @@ const userRoutes = ["/home"];
 export async function middleware(request: NextRequest) {
 
   const token = request.cookies.get("accessToken")?.value;
-  console.log("token is : ",token);
+  
+  console.log("user's token is : ",token);
 
   const { pathname } = request.nextUrl;
 
