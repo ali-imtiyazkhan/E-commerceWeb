@@ -5,23 +5,23 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-/** Generate JWT token */
+
 function generateToken(userId: string, email: string, role: string): string {
   return jwt.sign({ userId, email, role }, process.env.JWT_SECRET!, {
     expiresIn: "1h",
   });
 }
 
-/** Set JWT token in secure, HTTP-only cookie */
+
 function setToken(res: Response, token: string): void {
-  const isProduction = process.env.NODE_ENV === "production";
+ 
 
   res.cookie("accessToken", token, {
     httpOnly: true,
-    secure: isProduction,               // true in production, false in dev
-    sameSite: isProduction ? "none" : "lax",  // cross-site in prod, lax in dev
-    path: "/",                        // cookie valid for entire site
-    maxAge: 60 * 60 * 1000,          // 1 hour
+    secure: true, 
+    sameSite:  "none",
+    path: "/", 
+    maxAge: 60 * 60 * 1000,
   });
 }
 

@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2019",
     "module": "commonjs",
+    "rootDir": "./src",
     "outDir": "./dist",
-    "rootDir": "./",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "prisma/**/*", "seed.ts"]
+  "include": ["src/**/*", "prisma/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
