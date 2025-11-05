@@ -5,22 +5,21 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-
 function generateToken(userId: string, email: string, role: string): string {
   return jwt.sign({ userId, email, role }, process.env.JWT_SECRET!, {
     expiresIn: "1h",
   });
 }
 
-
 function setToken(res: Response, token: string): void {
- 
+  const isProduction = process.env.NODE_ENV === "production";
+  console.log("isproduction is true or false : ", isProduction);
 
   res.cookie("accessToken", token, {
     httpOnly: true,
-    secure: true, 
-    sameSite:  "none",
-    path: "/", 
+    secure: isProduction,
+    sameSite: "none",
+    path: "/",
     maxAge: 60 * 60 * 1000,
   });
 }
@@ -31,7 +30,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      res.status(400).json({ success: false, error: "All fields are required" });
+      res
+        .status(400)
+        .json({ success: false, error: "All fields are required" });
       return;
     }
 
@@ -67,7 +68,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res.status(400).json({ success: false, error: "Email and password are required" });
+      res
+        .status(400)
+        .json({ success: false, error: "Email and password are required" });
       return;
     }
 
