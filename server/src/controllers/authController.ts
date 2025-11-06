@@ -17,8 +17,8 @@ function setToken(res: Response, token: string): void {
 
   res.cookie("accessToken", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: isDev ? "lax" : "none",
+    secure: true,
+    sameSite: "none",
     path: "/",
     maxAge: 60 * 60 * 1000,
   });
