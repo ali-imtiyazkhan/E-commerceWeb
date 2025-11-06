@@ -12,7 +12,7 @@ function generateToken(userId: string, email: string, role: string): string {
 }
 
 function setToken(res: Response, token: string): void {
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = process.env.NODE_ENV === "development";
   console.log("isproduction is true or false : ", isProduction);
 
   res.cookie("accessToken", token, {
@@ -105,7 +105,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = process.env.NODE_ENV === "development";
 
   res.clearCookie("accessToken", {
     httpOnly: true,
