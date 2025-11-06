@@ -17,13 +17,12 @@ function setToken(res: Response, token: string): void {
 
   res.cookie("accessToken", token, {
     httpOnly: true,
-    secure: !isDev,
+    secure: false,
     sameSite: isDev ? "lax" : "none",
     path: "/",
     maxAge: 60 * 60 * 1000,
   });
 }
-
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -86,7 +85,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     const token = generateToken(user.id, user.email, user.role);
-    setToken(res, token); 
+    setToken(res, token);
 
     res.status(200).json({
       success: true,
