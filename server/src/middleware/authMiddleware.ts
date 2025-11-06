@@ -15,7 +15,7 @@ export const authenticateJwt = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // ✅ 1️⃣ Get token from Authorization header OR cookie
+  
     const authHeader = req.headers.authorization;
     const cookieToken = req.cookies?.accessToken;
 
