@@ -12,17 +12,18 @@ function generateToken(userId: string, email: string, role: string): string {
 }
 
 function setToken(res: Response, token: string): void {
-  const isProduction = process.env.NODE_ENV === "development";
-  console.log("isproduction is true or false : ", isProduction);
+  const isDev = process.env.NODE_ENV === "development";
+  console.log("Running in development:", isDev);
 
   res.cookie("accessToken", token, {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: "none",
+    secure: !isDev,
+    sameSite: isDev ? "lax" : "none",
     path: "/",
     maxAge: 60 * 60 * 1000,
   });
 }
+
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
