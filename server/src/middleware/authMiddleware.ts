@@ -9,66 +9,55 @@ export interface AuthenticatedRequest extends Request {
   };
 }
 
-export const authenticateJwt = async (
+export const authenticateJwt = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void> => {
-  try {
-  
-    const authHeader = req.headers.authorization;
-    const cookieToken = req.cookies?.accessToken;
+) => {
+  const accessToken = req.cookies.accessToken;
+  if (!accessToken) {
+    res
+      .status(401)
+      .json({ success: false, error: "Access token is not present" });
+    return;
+  }
 
-    const accessToken = authHeader?.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : cookieToken;
+  jwtVerify(accessToken, new TextEncoder().encode(process.env.JWT_SECRET))
+    .then((res) => {
+      const payload = res.payload as JWTPayload & {
+        userId: string;
+        email: string;
+        role: string;
+      };
 
-    console.log("accessToken received is :", accessToken);
-
-    if (!accessToken) {
+      req.user = {
+        userId: payload.userId,
+        email: payload.email,
+        role: payload.role,
+      };
+      next();
+    })
+    .catch((e) => {
+      console.error(e);
       res
         .status(401)
-        .json({ success: false, error: "Access token not provided" });
-      return;
-    }
-
-
-    const { payload } = await jwtVerify(
-      accessToken,
-      new TextEncoder().encode(process.env.JWT_SECRET)
-    );
-
-    const userPayload = payload as JWTPayload & {
-      userId: string;
-      email: string;
-      role: string;
-    };
-
-  
-    req.user = {
-      userId: userPayload.userId,
-      email: userPayload.email,
-      role: userPayload.role,
-    };
-
-    next();
-  } catch (error) {
-    console.error("JWT verification failed:", error);
-    res.status(401).json({ success: false, error: "Invalid or expired token" });
-  }
+        .json({ success: false, error: "Access token is not present" });
+    });
 };
 
 export const isSuperAdmin = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void => {
-  if (req.user?.role === "SUPER_ADMIN") {
+) => {
+  if (req.user && req.user.role === "SUPER_ADMIN") {
     next();
   } else {
-    res.status(403).json({
-      success: false,
-      error: "Access denied! Super admin access required",
-    });
+    res
+      .status(403)
+      .json({
+        success: false,
+        error: "Access denied! Super admin access required",
+      });
   }
 };

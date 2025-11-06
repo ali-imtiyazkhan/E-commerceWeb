@@ -1,7 +1,6 @@
 import multer from "multer";
 import path from "path";
 
-//configure stroage
 const stroage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
