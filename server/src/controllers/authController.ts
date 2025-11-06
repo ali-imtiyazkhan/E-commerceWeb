@@ -24,7 +24,6 @@ function setToken(res: Response, token: string): void {
   });
 }
 
-/** Register user */
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, password } = req.body;
@@ -62,7 +61,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/** Login user */
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
@@ -87,7 +85,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     const token = generateToken(user.id, user.email, user.role);
-    setToken(res, token); // sets JWT cookie
+    setToken(res, token); 
 
     res.status(200).json({
       success: true,
@@ -98,7 +96,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         role: user.role,
       },
-      accessToken: token, // optional, useful for frontend API calls
+      accessToken: token,
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -106,7 +104,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/** Logout user */
 export const logout = async (req: Request, res: Response): Promise<void> => {
   const isProduction = process.env.NODE_ENV === "production";
 

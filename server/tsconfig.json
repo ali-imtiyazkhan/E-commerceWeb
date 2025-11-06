@@ -4,11 +4,10 @@
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "./dist",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "express"] 
   },
   "include": ["src/**/*", "prisma/**/*"],
   "exclude": ["node_modules", "dist"]
